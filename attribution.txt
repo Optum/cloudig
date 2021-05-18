@@ -1,0 +1,228 @@
+Package: github.com/mattn/go-colorable
+
+License: MIT License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/MIT
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/kris-nova/lolgopher
+
+License: Apache License 2.0
+
+Copyrights: 
+
+
+License Text: 
+http://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/aws/aws-sdk-go
+
+License: Apache License 2.0
+
+Copyrights: 
+
+
+License Text: 
+http://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/aws/aws-sdk-go/internal/sync/singleflight
+
+License: BSD 3-Clause "New" or "Revised" License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/BSD-3-Clause
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/jmespath/go-jmespath
+
+License: Apache License 2.0
+
+Copyrights: 
+
+
+License Text: 
+http://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/dchest/uniuri
+
+License: Creative Commons Zero v1.0 Universal
+
+Copyrights: 
+
+
+License Text: 
+https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/PuerkitoBio/goquery
+
+License: BSD 3-Clause "New" or "Revised" License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/BSD-3-Clause
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: golang.org/x/net/html
+
+License: BSD 3-Clause "New" or "Revised" License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/BSD-3-Clause
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: gopkg.in/neurosnap/sentences.v1
+
+License: MIT License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/MIT
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/kris-nova/logger
+
+License: Apache License 2.0
+
+Copyrights: 
+
+
+License Text: 
+http://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/mattn/go-isatty
+
+License: MIT License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/MIT
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/olekukonko/tablewriter
+
+License: MIT License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/MIT
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: golang.org/x/sys
+
+License: BSD 3-Clause "New" or "Revised" License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/BSD-3-Clause
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/spf13/cobra
+
+License: Apache License 2.0
+
+Copyrights: 
+
+
+License Text: 
+http://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/andybalholm/cascadia
+
+License: BSD 2-Clause "Simplified" License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/BSD-2-Clause
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/mattn/go-runewidth
+
+License: MIT License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/MIT
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: gopkg.in/yaml.v2
+
+License: Apache License 2.0
+
+Copyrights: 
+
+
+License Text: 
+http://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/fatih/color
+
+License: MIT License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/MIT
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Package: github.com/spf13/pflag
+
+License: BSD 3-Clause "New" or "Revised" License
+
+Copyrights: 
+
+
+License Text: 
+https://opensource.org/licenses/BSD-3-Clause
+
+-------------------------------------------------------------------------------------------------------------------------------
+

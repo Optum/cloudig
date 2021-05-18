@@ -1,0 +1,23 @@
+- accountid: "111111111111"
+  ta-findings:
+    - SECURITY-IAM_Use: "**EXCEPTION:** We use Federation and IAM roles to manage resources in AWS . No users/groups created in IAM"
+  config-findings:
+    - IAM_POLICY_BLACKLISTED_CHECK: "**EXCEPTION:** Removed access policy since the default account uses this policy. Future enhancement would be to create a Custom Rule that only admin account can use this policy."
+  inspector-findings:
+    - CIS_Operating_System_Security_Configuration_Benchmarks-1.0: "**EXCEPTION:** Temporary, will be fixed in next release"
+  health-findings:
+    - AWS_RDS_SECURITY_NOTIFICATION: "**EXCEPTION:** Temporary, will be fixed in next release"
+  reflect-iam-findings:
+    - arn:aws:iam::111111111111:role/example-role: "**WORK_IN_PROGRESS:** Lot of unnecessary permissions"
+- accountid: "222222222222"
+  ta-findings:
+    - SECURITY-IAM_Use: "**EXCEPTION:** We use IAM roles to manage resources in AWS. No users/groups created in IAM"
+    - FAULT_TOLERANCE-Amazon_EBS_Snapshots: "**EXCEPTION:** We do not persist any critical data on EC2 attached EBS. Data present in these disks are ephemeral in nature"
+  config-findings:
+    - ATTACHED_INTERNET_GATEWAY_CHECK: "**EXCEPTION:** Flags VPCs that have an Internet Gateway attached which is currently required. Future enhancement would be to check VPC with all of its SUBNET open to IGW"
+    - IAM_POLICY_BLACKLISTED_CHECK: "**EXCEPTION:** Removed access policy since the default account uses this policy. Future enhancement would be to create a Custom Rule that only admin account can use this policy."
+- accountid: "333333333333"
+  ecr-findings:
+    - 333333333333.dkr.ecr.us-east-1.amazonaws.com/admin/example-app:v1.0.0: "EXCEPTION Patch will applied this weekend"
+    - ALL:v1.2.0: "EXCEPTION Patch is coming tomorrow"
+    - ALL:prod-canary: "EXCEPTION Patch is coming tomorrow"

@@ -1,0 +1,10 @@
+reports/*
+report.md
+cloudig
+cloudig*
+!pkg/**
+.DS_STORE
+.vscode
+.idea/
+cover.out
+dist/

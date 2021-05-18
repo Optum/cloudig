@@ -1,0 +1,22 @@
+- accountid: "111111111111"
+  ta-findings:
+    - SECURITY-IAM_Use: "**EXCEPTION:** We use Federation and IAM roles to manage resources in AWS . No users/groups created in IAM"
+  config-findings:
+    - IAM_POLICY_BLACKLISTED_CHECK: "**EXCEPTION:** Removed the AdminstratorAccess policy since the default AWS_*_Admins uses the policy. Future enhancement would be to create a Custom Rule that no other Role can use the AdmnistratorAccess policy besides the AWS_*_Admins"
+  inspector-findings:
+    - CIS_Operating_System_Security_Configuration_Benchmarks-1.0: "**EXCEPTION:** Description here"
+  health-findings:
+    - AWS_RDS_SECURITY_NOTIFICATION: "**EXCEPTION:** Description here"
+  reflect-iam-findings:
+    - arn:aws:iam::111111111111:role/eks-worker-dig-green-dev: "**EXCEPTION:** Ignore AccessDenied error. This role doesn't require s3.amazonaws.com/HeadObject access for its functionality"
+- accountid: "222222222222"
+  ta-findings:
+    - SECURITY-IAM_Use: "**EXCEPTION:** We use Federation and IAM roles to manage resources in AWS . No users/groups created in IAM"
+    - FAULT_TOLERANCE-Amazon_EBS_Snapshots: "**EXCEPTION:** We do not persist any critical data on EC2 attached EBS. Data present in these disks are ephemeral in nature"
+  config-findings:
+    - ATTACHED_INTERNET_GATEWAY_CHECK: "**EXCEPTION:** Flags VPCs that have an Internet Gateway attached, Most of our VPC requires IGW enabled in Public subnets as they are web application open to Internet. Better RULE would be to check VPC with all of its SUBNET open to IGW"
+    - IAM_POLICY_BLACKLISTED_CHECK: "**EXCEPTION:** Removed the AdminstratorAccess policy since the default AWS_*_Admins uses the policy. Future enhancement would be to create a Custom Rule that no other Role can use the AdmnistratorAccess policy besides the AWS_*_Admins"
+- accountid: "012345678910"
+  ecr-findings:
+    - 012345678910.dkr.ecr.us-east-1.amazonaws.com/app/web-server:prod-canary: "EXCEPTION Patch will applied this weekend"
+    - ALL:v1.2.0: "EXCEPTION Patch is coming tomorrow"
