@@ -72,11 +72,11 @@ The currently supported cloud sources are:
 1. Downloading latest release binary:
 
 ```bash
-# <ARCH> Darwin_arm64 
+# <ARCH> Darwin_arm64
 # <VERSION> 0.1.0
 
- curl -O https://github.com/Optum/cloudig/releases/download/v<VERSION>/cloudig_<VERSION>_<ARCH>.tar.gz  \
- &&  tar -xf cloudig_<VERSION>_<ARCH>.tar.gz \
+ curl -LO https://github.com/Optum/cloudig/releases/download/v<VERSION>/cloudig_<VERSION>_<ARCH>.tar.gz  \
+ &&  tar -xf cloudig_<VERSION>_<ARCH>.tar.gz cloudig \
  && chmod +x cloudig \
  && mv cloudig /usr/local/bin \
  && cloudig --help
