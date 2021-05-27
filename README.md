@@ -1,5 +1,5 @@
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/optum/cloudig/graphs/commit-activity)
-![build](https://github.com/optum/cloudig/workflows/build/badge.svg?branch=main)
+![build](https://github.com/optum/cloudig/workflows/build/badge.svg?branch=master)
 [![Github all releases](https://img.shields.io/github/downloads/optum/cloudig/total.svg)](https://GitHub.com/optum/cloudig/releases/)
 
 [comment]: <> (<a href="https://cla-assistant.io/Optum/cloudig"><img src="https://cla-assistant.io/readme/badge/Optum/cloudig" alt="CLA assistant" /></a>)
