@@ -2,6 +2,7 @@ package cloudig
 
 import (
 	"errors"
+	"io/ioutil"
 	"reflect"
 	"testing"
 	"time"
@@ -10,19 +11,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/athena"
 	"github.com/golang/mock/gomock"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 )
 
 func TestReflectReport_GetReport(t *testing.T) {
-	// 	report := ReflectReport{}
-	// 	sess, _ := awslocal.NewAuthenticatedSession("us-east-1")
-	// 	client := awslocal.NewClient(sess)
-	// 	comments := make([]Comments, 0)
-	// 	err := report.GetReport(client, &comments)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// 	t.Fail()
+	logrus.SetOutput(ioutil.Discard)
 	athenaResultSetUsage := &athena.ResultSet{
 		ResultSetMetadata: &athena.ResultSetMetadata{ColumnInfo: []*athena.ColumnInfo{
 			{
@@ -332,7 +325,6 @@ func TestReflectReport_GetReport(t *testing.T) {
 				Findings: tt.initFindings,
 				Flags:    tt.flags,
 			}
-			logger.Level = 1
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			mockAPI := mocks.NewMockAPIs(mockCtrl)
@@ -361,7 +353,7 @@ func TestReflectReport_GetReport(t *testing.T) {
 }
 
 func TestReflectReport_populateFindings(t *testing.T) {
-
+	logrus.SetOutput(ioutil.Discard)
 	type args struct {
 		tableName string
 	}
@@ -684,6 +676,7 @@ func TestReflectReport_populateFindings(t *testing.T) {
 }
 
 func TestReflectReport_updateFinding(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	type args struct {
 		identity string
 		eventD   accessDetails
@@ -899,6 +892,7 @@ func TestReflectReport_updateFinding(t *testing.T) {
 }
 
 func Test_constructFinding(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	type args struct {
 		dataSlice []string
 		keys      []string
@@ -960,6 +954,7 @@ func Test_constructFinding(t *testing.T) {
 }
 
 func Test_createQueryFromFlags(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	type args struct {
 		flags     ReflectFlags
 		tableName string
@@ -1101,6 +1096,7 @@ ORDER BY useridentity.arn,count DESC
 }
 
 func Test_getAbsoluteTime(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	type args struct {
 		timeRelative int
 		now          time.Time
@@ -1154,6 +1150,7 @@ func Test_getAbsoluteTime(t *testing.T) {
 }
 
 func Test_ConstructPartitionDataFromTime(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name           string
 		timeAbsolute   string

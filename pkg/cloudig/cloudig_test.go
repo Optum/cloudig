@@ -1,9 +1,11 @@
 package cloudig
 
 import (
+	"io/ioutil"
 	"testing"
 
 	"github.com/go-test/deep"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -154,6 +156,7 @@ func TestParseRoleARNs(t *testing.T) {
 }
 
 func TestParseCommentsFile(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name           string
 		file           string

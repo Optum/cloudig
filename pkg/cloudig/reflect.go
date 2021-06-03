@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/service/athena"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -89,9 +89,9 @@ func (report *ReflectReport) GetReport(client awslocal.APIs, comments []Comments
 	if err != nil {
 		return err
 	}
-	logger.Info("working on reflect report for account: %s", accountID)
+	logrus.Infof("working on reflect report for account: %s", accountID)
 
-	logger.Info("getting the s3 prefix associated with the CloudTrail for account: %s", accountID)
+	logrus.Infof("getting the s3 prefix associated with the CloudTrail for account: %s", accountID)
 	// get S3 bucket with prefix associated with CloudTrail
 	s3Prefix, err := client.GetS3LogPrefixForCloudTrail()
 	if err != nil {
@@ -102,7 +102,7 @@ func (report *ReflectReport) GetReport(client awslocal.APIs, comments []Comments
 		return fmt.Errorf("Either Cloudtrail is not enabled or doesn't have an S3 bucket associated in account: %s", accountID)
 	}
 
-	logger.Debug("retrieving the list of AWS regions")
+	logrus.Debugf("retrieving the list of AWS regions")
 	regionList := make([]string, 0)
 	for _, p := range endpoints.DefaultPartitions() {
 		for region := range p.Regions() {
@@ -112,26 +112,26 @@ func (report *ReflectReport) GetReport(client awslocal.APIs, comments []Comments
 	// Consistent ordering avoids creating table due to metadata mismatch
 	sort.Strings(regionList)
 
-	logger.Info("constructing the Athena table metadata form the s3 prefix for account: %s", accountID)
+	logrus.Infof("constructing the Athena table metadata form the s3 prefix for account: %s", accountID)
 	// construct Athena table metadata from s3 location
 	meta := awslocal.NewAthenaTableMetaDataForCloudTrail(aws.StringValue(s3Prefix), regionList)
 
 	// get existing or new table name
-	logger.Info("finding the existing Athena table from the constructed metadata for account: %s", accountID)
+	logrus.Infof("finding the existing Athena table from the constructed metadata for account: %s", accountID)
 	tableName, err := client.GetTableforMetadata(meta)
 	if err != nil {
-		logger.Warning("error getting the existing valid Athena table from the account %s: %s", accountID, err.Error())
+		logrus.Warnf("error getting the existing valid Athena table from the account %s: %s", accountID, err.Error())
 	}
 	if tableName == nil {
-		logger.Warning("could not get valid Athena table from the account %s", accountID)
-		logger.Info("creating new Athena table in account: %s", accountID)
+		logrus.Warnf("could not get valid Athena table from the account %s", accountID)
+		logrus.Infof("creating new Athena table in account: %s", accountID)
 		tableName, err = client.CreateTableFromMetadata(meta)
 		if err != nil {
-			logger.Critical("error creating Athena table in account: %s : %v", accountID, err)
+			logrus.Errorf("error creating Athena table in account: %s : %v", accountID, err)
 			return err
 		}
 	} else {
-		logger.Info("found the existing Athena table: %s for account: %s", aws.StringValue(tableName), accountID)
+		logrus.Infof("found the existing Athena table: %s for account: %s", aws.StringValue(tableName), accountID)
 	}
 	targetedRoles := make([]string, 0)
 	// Update roles if roles from Flags are empty but roleTags are provided
@@ -139,12 +139,12 @@ func (report *ReflectReport) GetReport(client awslocal.APIs, comments []Comments
 		// if RoleTags are also empty, we do nothing here
 		if len(flags.roleTags) > 0 {
 			// list all roles with a specific set of tags
-			logger.Info("getting the roles from tags: %v for account: %s", flags.roleTags, accountID)
+			logrus.Infof("getting the roles from tags: %v for account: %s", flags.roleTags, accountID)
 			roles, err := client.GetRolesFromTags(flags.roleTags)
 			if err != nil {
-				logger.Info("could not get roles from tags for account: %s : %v", accountID, err)
+				logrus.Infof("could not get roles from tags for account: %s : %v", accountID, err)
 			} else {
-				logger.Debug("list of roles from tags %v: %v for account: %s", flags.roleTags, roles, accountID)
+				logrus.Debugf("list of roles from tags %v: %v for account: %s", flags.roleTags, roles, accountID)
 				if len(roles) == 0 {
 					return fmt.Errorf("no roles found for the given set of tags %v in account: %s", flags.roleTags, accountID)
 				}
@@ -157,12 +157,12 @@ func (report *ReflectReport) GetReport(client awslocal.APIs, comments []Comments
 	}
 
 	// polpulate the findings for a given roles
-	logger.Info("populating findings for roles in account: %s", accountID)
+	logrus.Infof("populating findings for roles in account: %s", accountID)
 	findings, err := populateFindings(client, aws.StringValue(tableName), flags)
 	if err != nil {
 		return err
 	}
-	logger.Success("successfully populated the findings for roles in account: %s", accountID)
+	logrus.Infof("successfully populated the findings for roles in account: %s", accountID)
 
 	permissionForRoles := make(map[string][]string)
 
@@ -173,8 +173,8 @@ func (report *ReflectReport) GetReport(client awslocal.APIs, comments []Comments
 			targetedRoles = append(targetedRoles, strings.Split(v.Identity, identityDelimiter)[0])
 		}
 	}
-	logger.Debug("targeted roles are %v", targetedRoles)
-	logger.Info("finding the actual permission for the roles in account: %s", accountID)
+	logrus.Debugf("targeted roles are %v", targetedRoles)
+	logrus.Infof("finding the actual permission for the roles in account: %s", accountID)
 	permissionForRoles = client.GetNetIAMPermissionsForRoles(targetedRoles)
 
 	// loop through all findings to add comments and policy actions
@@ -184,7 +184,7 @@ func (report *ReflectReport) GetReport(client awslocal.APIs, comments []Comments
 		findings[k].Comments = getComments(comments, accountID, findingTypeReflectIAM, v.Identity)
 	}
 	report.Findings = append(report.Findings, findings...)
-	logger.Success("reflecting on account %s took %s", accountID, time.Since(start))
+	logrus.Infof("reflecting on account %s took %s", accountID, time.Since(start))
 	return nil
 }
 
@@ -194,7 +194,7 @@ func populateFindings(client awslocal.APIs, tableName string, flags ReflectFlags
 	output := make(chan runQueryResult, 2)
 
 	if flags.usageReport {
-		logger.Debug("reflecting on usage report")
+		logrus.Debugf("reflecting on usage report")
 		wg.Add(1)
 		// Run query - 1
 		go func() {
@@ -205,7 +205,7 @@ func populateFindings(client awslocal.APIs, tableName string, flags ReflectFlags
 	}
 
 	if flags.errorReport {
-		logger.Debug("reflecting on error report")
+		logrus.Debugf("reflecting on error report")
 		wg.Add(1)
 		// Run Query - 2
 		go func() {
@@ -317,12 +317,12 @@ func constructFinding(dataSlice, keys []string) (string, accessDetails) {
 	}
 	count, err := strconv.Atoi(dataSlice[indexMap[keyCount]])
 	if err != nil {
-		logger.Critical("error converting count value from string '%s' to int: %v", dataSlice[indexMap[keyCount]], err)
+		logrus.Errorf("error converting count value from string '%s' to int: %v", dataSlice[indexMap[keyCount]], err)
 		eventD.Count = 0
 	} else {
 		eventD.Count = count
 	}
-	logger.Debug("constructed finding %s -> %v", identity, eventD)
+	logrus.Debugf("constructed finding %s -> %v", identity, eventD)
 	return identity, eventD
 }
 
@@ -398,7 +398,7 @@ ORDER BY useridentity.arn,{{.Count}} DESC
 		t := template.Must(template.New("").Parse(queryString))
 		err := t.Execute(&tpl, queryData)
 		if err != nil {
-			logger.Critical("error constructing the usage Athena query: %v", err)
+			logrus.Errorf("error constructing the usage Athena query: %v", err)
 			os.Exit(1) // intentional
 		}
 	} else if queryType == queryForErrors {
@@ -420,14 +420,14 @@ ORDER BY useridentity.arn,{{.Count}} DESC
 		t := template.Must(template.New("").Parse(queryString))
 		err := t.Execute(&tpl, queryData)
 		if err != nil {
-			logger.Critical("error constructing the error Athena query: %v", err)
+			logrus.Errorf("error constructing the error Athena query: %v", err)
 			os.Exit(1) // intentional
 		}
 	}
 	query := tpl.String()
 	// Be aware of this for https://github.com/kris-nova/logger/pull/4
 	// AND (errorcode LIKE '%!U(MISSING)nauthorizedOperation' OR errorcode LIKE 'AccessDenied%!'(MISSING))
-	logger.Debug("constructred query: %s", query)
+	logrus.Debugf("constructred query: %s", query)
 	return query
 }
 
@@ -444,7 +444,7 @@ func getAbsoluteTime(timeRelative int, now time.Time) string {
 	y1, m1, d1 := startTime.Date()
 	y2, m2, d2 := endTime.Date()
 	absTime := fmt.Sprintf("%02d/%02d/%d-%02d/%02d/%d", int(m1), d1, y1, int(m2), d2, y2)
-	logger.Debug("converted relative time: %d days to absolute time: %s", timeRelative, absTime)
+	logrus.Debugf("converted relative time: %d days to absolute time: %s", timeRelative, absTime)
 	return absTime
 }
 
@@ -458,12 +458,12 @@ func constructPartitionDataFromTime(timeAbsolute string) timeRange {
 	// convert to time
 	startTime, err = time.Parse(format, startDate)
 	if err != nil {
-		logger.Critical("could not parse start time from given abolutetime %s", timeAbsolute)
+		logrus.Errorf("could not parse start time from given abolutetime %s", timeAbsolute)
 		os.Exit(1)
 	}
 	endTime, err = time.Parse(format, endDate)
 	if err != nil {
-		logger.Critical("could not parse end time from given abolutetime %s", timeAbsolute)
+		logrus.Errorf("could not parse end time from given abolutetime %s", timeAbsolute)
 		os.Exit(1)
 	}
 	years := make([]int, 0)
@@ -558,6 +558,6 @@ func constructPartitionDataFromTime(timeAbsolute string) timeRange {
 	sort.Ints(months)
 	sort.Ints(days)
 	sort.Ints(years)
-	logger.Debug("converted partition data from absolute time: %s is %v", timeAbsolute, timeRange{months, days, years, eventTimeRange})
+	logrus.Debugf("converted partition data from absolute time: %s is %v", timeAbsolute, timeRange{months, days, years, eventTimeRange})
 	return timeRange{months, days, years, eventTimeRange}
 }

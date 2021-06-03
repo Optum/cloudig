@@ -6,15 +6,13 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.0
 	github.com/aws/aws-sdk-go v1.35.2
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
-	github.com/fatih/color v1.10.0 // indirect
 	github.com/go-test/deep v1.0.7
 	github.com/golang/mock v1.4.4
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/kris-nova/logger v0.0.0-20181127235838-fd0d87064b06
-	github.com/kris-nova/lolgopher v0.0.0-20180124180951-14d43f83481a // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/neurosnap/sentences v1.0.6 // indirect
 	github.com/olekukonko/tablewriter v0.0.1
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect

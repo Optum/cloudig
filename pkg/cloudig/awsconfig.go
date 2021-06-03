@@ -5,7 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/configservice"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 
 	awslocal "github.com/Optum/cloudig/pkg/aws"
 )
@@ -41,10 +41,10 @@ func (report *ConfigReport) GetReport(client awslocal.APIs, comments []Comments)
 	if err != nil {
 		return err
 	}
-	logger.Info("working on AWSConfigCompliance report for account: %s", accountID)
+	logrus.Infof("working on AWSConfigCompliance report for account: %s", accountID)
 	finding.AccountID = accountID
 
-	logger.Info("finding failing compliance config rules for account: %s", accountID)
+	logrus.Infof("finding failing compliance config rules for account: %s", accountID)
 	results, err := client.GetNonComplaintConfigRules()
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (report *ConfigReport) GetReport(client awslocal.APIs, comments []Comments)
 	// Parse results into findings
 	report.Findings = append(report.Findings, processConfigResults(results, finding, comments)...)
 
-	logger.Success("getting AWSConfigCompliance for account %s took %s", finding.AccountID, time.Since(start))
+	logrus.Infof("getting AWSConfigCompliance for account %s took %s", finding.AccountID, time.Since(start))
 	return nil
 }
 

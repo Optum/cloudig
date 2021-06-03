@@ -2,10 +2,12 @@ package cloudig
 
 import (
 	"errors"
+	"io/ioutil"
 	"testing"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/sirupsen/logrus"
 
 	"github.com/Optum/cloudig/pkg/mocks"
 
@@ -16,6 +18,7 @@ import (
 )
 
 func TestGetHealthReport(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name               string
 		eventInput         []*string

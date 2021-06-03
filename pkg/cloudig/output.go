@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/olekukonko/tablewriter"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -25,7 +25,7 @@ func (helper *jsonOutputHelper) toJSON(report *Report) string {
 	content, err := json.MarshalIndent(report, "", "  ")
 
 	if err != nil {
-		logger.Critical("unable to marshal the output into JSON: %v", err)
+		logrus.Errorf("unable to marshal the output into JSON: %v", err)
 	}
 	return string(content)
 }
@@ -40,7 +40,7 @@ func (report *TrustedAdvisorReport) toTable(tableType string) string {
 		table.Append([]string{finding.AccountID, nameCol, flaggedResourcesCol, finding.Comments})
 	}
 
-	logger.Always("report Time: %s", report.ReportTime)
+	logrus.Infof("report Time: %s", report.ReportTime)
 	table.Render()
 
 	return tableString.String()
@@ -59,7 +59,7 @@ func (report *ConfigReport) toTable(tableType string) string {
 		table.Append([]string{finding.AccountID, finding.RuleName, flaggedResourcesCol, finding.Comments})
 	}
 
-	logger.Always("report Time: %s", report.ReportTime)
+	logrus.Infof("report Time: %s", report.ReportTime)
 	table.Render()
 
 	return tableString.String()
@@ -85,7 +85,7 @@ func (reports *InspectorReports) toTable(tableType string) string {
 		}
 	}
 
-	logger.Always("report Time: %s", reports.ReportTime)
+	logrus.Infof("report Time: %s", reports.ReportTime)
 	findingsTable.Render()
 	amiTable.Render()
 
@@ -101,7 +101,7 @@ func (report *HealthReport) toTable(tableType string) string {
 		table.Append([]string{finding.AccountID, finding.EventTypeCode, finding.Region, finding.StatusCode, finding.EventDescription, strings.Join(finding.AffectedEntities, ", "), finding.Comments})
 	}
 
-	logger.Always("report Time: %s", report.ReportTime)
+	logrus.Infof("report Time: %s", report.ReportTime)
 	table.Render()
 
 	return tableString.String()
@@ -137,7 +137,7 @@ func (report *ImageScanReports) toTable(tableType string) string {
 		previousRegion = finding.Region
 	}
 
-	logger.Always("report Time: %s", report.ReportTime)
+	logrus.Infof("report Time: %s", report.ReportTime)
 	table.Render()
 
 	return tableString.String()
@@ -158,7 +158,7 @@ func (report *ReflectReport) toTable(tableType string) string {
 		table.Append([]string{finding.AccountID, finding.Identity, accDetCol, perSetCol, finding.Comments})
 	}
 
-	logger.Always("report Time: %s", report.ReportTime)
+	logrus.Infof("report Time: %s", report.ReportTime)
 	table.Render()
 
 	return tableString.String()

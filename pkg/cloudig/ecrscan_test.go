@@ -2,16 +2,19 @@ package cloudig
 
 import (
 	"errors"
+	"io/ioutil"
 	"testing"
 
 	"github.com/Optum/cloudig/pkg/mocks"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/golang/mock/gomock"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestImageScanReports_GetReport(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name                             string
 		accountID                        string

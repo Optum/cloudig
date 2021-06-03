@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 )
 
 // ImageScanReports struct specify the format of scan reports
@@ -43,13 +43,13 @@ func (report *ImageScanReports) GetReport(client awslocal.APIs, comments []Comme
 	if err != nil {
 		return err
 	}
-	logger.Info("working on ECR Scan report for account: %s", accountID)
+	logrus.Infof("working on ECR Scan report for account: %s", accountID)
 
 	// Get all images with a given tag
 	if report.Flags.Tag != "" {
-		logger.Info("finding all ECR images with tag: %s for account: %s in region: %s", report.Flags.Tag, accountID, report.Flags.Region)
+		logrus.Infof("finding all ECR images with tag: %s for account: %s in region: %s", report.Flags.Tag, accountID, report.Flags.Region)
 	} else {
-		logger.Info("finding all tagged ECR images for account: %s in region: %s", accountID, report.Flags.Region)
+		logrus.Infof("finding all tagged ECR images for account: %s in region: %s", accountID, report.Flags.Region)
 	}
 	images, err := client.GetECRImagesWithTag(report.Flags.Tag)
 	if err != nil {
@@ -91,7 +91,7 @@ func (report *ImageScanReports) GetReport(client awslocal.APIs, comments []Comme
 		}
 	}
 
-	logger.Success("getting ECR Scan Results for account %s took %s", accountID, time.Since(start))
+	logrus.Infof("getting ECR Scan Results for account %s took %s", accountID, time.Since(start))
 	return nil
 }
 

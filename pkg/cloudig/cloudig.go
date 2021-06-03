@@ -10,7 +10,7 @@ import (
 
 	awslocal "github.com/Optum/cloudig/pkg/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 )
 
 // Comments is a Collection of user comments mapped to yaml structure
@@ -47,7 +47,7 @@ func ProcessReport(sess *session.Session, report Report, outputType string, comm
 	// Parse comments file into map and pass to report
 	comments := parseCommentsFile(commentsFile)
 	accounts := parseRoleARNs(roleARNs)
-	logger.Debug("accounts derived from role ARN is: %v", accounts)
+	logrus.Debugf("accounts derived from role ARN is: %v", accounts)
 	parentClient := awslocal.NewClient(sess)
 
 	// Add all go routines to be executed to wait group for effective synchronization
@@ -65,7 +65,7 @@ func ProcessReport(sess *session.Session, report Report, outputType string, comm
 
 			err := report.GetReport(client, comments)
 			if err != nil {
-				logger.Warning("error getting the report for the account '%s': %v", accounts[i], err)
+				logrus.Warnf("error getting the report for the account '%s': %v", accounts[i], err)
 				es = append(es, err.Error())
 			}
 
@@ -103,14 +103,14 @@ func parseCommentsFile(commentsFile string) []Comments {
 
 	content, err := ioutil.ReadFile(commentsFile)
 	if err != nil {
-		logger.Warning("error reading file %s: %v", commentsFile, err)
+		logrus.Warnf("error reading file %s: %v", commentsFile, err)
 	} else {
-		logger.Info("reading comments from file %s", commentsFile)
+		logrus.Infof("reading comments from file %s", commentsFile)
 	}
 
 	err = yaml.Unmarshal(content, &comments)
 	if err != nil {
-		logger.Warning("unable to parse comments from file %s: %v", commentsFile, err)
+		logrus.Warnf("unable to parse comments from file %s: %v", commentsFile, err)
 	}
 
 	return comments

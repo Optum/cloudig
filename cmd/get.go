@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -9,7 +10,7 @@ import (
 	awslocal "github.com/Optum/cloudig/pkg/aws"
 	"github.com/Optum/cloudig/pkg/cloudig"
 
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +29,7 @@ var (
 	includeCallerIdentity bool
 	absoluteTime          string
 	relativeTime          int
+	loggingLevel          string
 )
 
 // getCmd represents the get command
@@ -191,6 +193,24 @@ var iamCmd = &cobra.Command{
 	},
 }
 
+func getLogLevel(level string) logrus.Level {
+	if level == "0" || strings.ToLower(level) == "silent" {
+		// forced silence
+		logrus.SetOutput(ioutil.Discard)
+		return logrus.ErrorLevel
+	} else if level == "1" || strings.ToLower(level) == "error" {
+		return logrus.ErrorLevel
+	} else if level == "2" || strings.ToLower(level) == "warn" {
+		return logrus.WarnLevel
+	} else if level == "4" || strings.ToLower(level) == "debug" {
+		return logrus.DebugLevel
+	} else if level == "5" || strings.ToLower(level) == "trace" {
+		return logrus.TraceLevel
+	} else {
+		return logrus.InfoLevel
+	}
+}
+
 func init() {
 	rootCmd.AddCommand(getCmd)
 	rootCmd.AddCommand(reflectCmd)
@@ -207,9 +227,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&roleARN, "rolearn", "", "One or more role ARNs seperated by a comma [,]")
 	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "json", "Output of report. Options: [json, table, mdtable]. Default output is JSON")
 	rootCmd.PersistentFlags().StringVarP(&region, "region", "r", "us-east-1", "AWS region to get results from")
-	rootCmd.PersistentFlags().IntVarP(&logger.Level, "verbose", "v", 3, "set log level, use 0 to silence, 1 for critical, 2 for warning, 3 for informational, 4 for debugging and 5 for debugging with AWS debug logging (default 3)")
-	// this is CLI , so turning of timestamp
-	logger.Timestamps = false
+	rootCmd.PersistentFlags().StringVarP(&loggingLevel, "verbose", "v", "3", "set log level, use 0 or silence to silence, 1 or error for critical, 2 or warn for warning, 3 or info for informational, 4 or deubg for debugging and 5 or trace for debugging with AWS debug logging (default 3)")
+	// logrus.Timestamps = false
 	// healthCmd specific flags
 	healthCmd.PersistentFlags().BoolVarP(&details, "details", "d", false, "Flag to indicate level of printing for each notification (default false)")
 	healthCmd.PersistentFlags().StringVar(&pastDays, "pastdays", "", "Number of past days to get results from")
@@ -229,25 +248,27 @@ func init() {
 }
 
 func execute(report cloudig.Report) {
+	logrus.SetLevel(getLogLevel(loggingLevel))
+
 	sess, err := awslocal.NewAuthenticatedSession(region)
 	if err != nil {
-		logger.Critical("error creating aws session: %v", err)
+		logrus.Errorf("error creating aws session: %v", err)
 		os.Exit(1)
 	}
 
 	// example type should be "*cloudig.HealthReport", we are spliting the string to get "HealthReport"
 	rType := strings.Split(fmt.Sprintf("%T", report), ".")[1]
-	logger.Debug("all root level flags:\ncommentsFile: %s\nroleARN: %s\noutput: %s\nregion: %s\nlogLevel: %d\n", commentsFile, roleARN, output, region, logger.Level)
+	logrus.Debugf("all root level flags:\ncommentsFile: %s\nroleARN: %s\noutput: %s\nregion: %s\nlogLevel: %d\n", commentsFile, roleARN, output, region, logrus.GetLevel())
 
 	if rType == "HealthReport" {
-		logger.Debug("all health command flags:\ndetails: %t\npastDays: %s\n", details, pastDays)
+		logrus.Debugf("all health command flags:\ndetails: %t\npastDays: %s\n", details, pastDays)
 	}
 	if rType == "ReflectReport" {
-		logger.Debug("all reflect command flags:\nidentityARNs: %s\nidentityTags: %s\nincludeUsage: %t\nincludeErrors: %t\nincludeCallerIdentity: %t\nabsoluteTime: %s\nrelativeTime: %d\n", identityARNs, identityTags, includeUsage, includeErrors, includeCallerIdentity, absoluteTime, relativeTime)
+		logrus.Debugf("all reflect command flags:\nidentityARNs: %s\nidentityTags: %s\nincludeUsage: %t\nincludeErrors: %t\nincludeCallerIdentity: %t\nabsoluteTime: %s\nrelativeTime: %d\n", identityARNs, identityTags, includeUsage, includeErrors, includeCallerIdentity, absoluteTime, relativeTime)
 	}
 
 	err = cloudig.ProcessReport(sess, report, output, commentsFile, roleARN)
 	if err != nil {
-		logger.Critical("error creating '%s': %v", rType, err)
+		logrus.Errorf("error creating '%s': %v", rType, err)
 	}
 }

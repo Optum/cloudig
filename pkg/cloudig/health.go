@@ -11,7 +11,7 @@ import (
 	awslocal "github.com/Optum/cloudig/pkg/aws"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/health"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 )
 
 // HealthReport is a struct that contains an array of healthReport
@@ -47,9 +47,9 @@ func (report *HealthReport) GetReport(client awslocal.APIs, comments []Comments)
 	if err != nil {
 		return err
 	}
-	logger.Info("working on AWS HealthReport for account: %s", accountID)
+	logrus.Infof("working on AWS HealthReport for account: %s", accountID)
 
-	logger.Info("finding all health events for account: %s", accountID)
+	logrus.Infof("finding all health events for account: %s", accountID)
 	// get basic event info, and create arn array to then query specifically for detailed output
 	arnArr, err := createArnArray(client, report.Flags)
 	if err != nil {
@@ -61,7 +61,7 @@ func (report *HealthReport) GetReport(client awslocal.APIs, comments []Comments)
 		return err
 	}
 
-	logger.Info("finding affected entities for health events in account: %s", accountID)
+	logrus.Infof("finding affected entities for health events in account: %s", accountID)
 	// a map is needed here to synchronize with eventdetails
 	affectedEntities, err := getAllAffectedEntities(client, arnArr, 10)
 	if err != nil {
@@ -91,7 +91,7 @@ func (report *HealthReport) GetReport(client awslocal.APIs, comments []Comments)
 		report.Findings = append(report.Findings, finding)
 	}
 
-	logger.Success("getting AWS HealthReport for account %s took %s", accountID, time.Since(start))
+	logrus.Infof("getting AWS HealthReport for account %s took %s", accountID, time.Since(start))
 	return nil
 }
 

@@ -7,7 +7,7 @@ import (
 	awslocal "github.com/Optum/cloudig/pkg/aws"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/support"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 )
 
 // TrustedAdvisorReport is struct that contains an array of Trusted Advisor findings
@@ -37,15 +37,15 @@ func (report *TrustedAdvisorReport) GetReport(client awslocal.APIs, comments []C
 	if err != nil {
 		return err
 	}
-	logger.Info("working on TrustedAdvisorReport for account: %s", accountID)
-	logger.Info("finding failing Trusted Advisor checks for account: %s", accountID)
+	logrus.Infof("working on TrustedAdvisorReport for account: %s", accountID)
+	logrus.Infof("finding failing Trusted Advisor checks for account: %s", accountID)
 	results, err := client.GetFailingTrustedAdvisorCheckResults()
 	if err != nil {
 		return err
 	}
 
 	report.Findings = processTrustedAdvisorResults(results, accountID, comments)
-	logger.Success("getting AWS TrustedAdvisorReport for account %s took %s", finding.AccountID, time.Since(start))
+	logrus.Infof("getting AWS TrustedAdvisorReport for account %s took %s", finding.AccountID, time.Since(start))
 	return nil
 }
 

@@ -21,7 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/inspector"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/aws-sdk-go/service/support"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
@@ -111,11 +111,11 @@ func getRoleCredentials(sess *session.Session, roleARN string) (creds *credentia
 // constructAWSConfig is helper function to create and return pointer to aws config
 func constructAWSConfig() *aws.Config {
 	config := aws.NewConfig()
-	if logger.Level >= 5 {
+	if logrus.GetLevel() >= 5 {
 		config.WithCredentialsChainVerboseErrors(true).
 			WithLogLevel(aws.LogDebugWithHTTPBody).
 			WithLogger(aws.LoggerFunc(func(args ...interface{}) {
-				logger.Debug(fmt.Sprintln(args...))
+				logrus.Debugf(fmt.Sprintln(args...))
 			}))
 	}
 	return config

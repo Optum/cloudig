@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/golang/mock/gomock"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,6 +31,7 @@ func (fakeHelper *fakeInspectorHelper) downloadReport(reportURL string, report i
 }
 
 func TestInspectorGetReport(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name                                        string
 		accountID                                   string
@@ -288,6 +290,7 @@ func TestInspectorGetReport(t *testing.T) {
 }
 
 func TestGetAssessmentRunAgentAMIAndAge(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name                                     string
 		resourceGroupTags                        map[string]string
@@ -435,6 +438,7 @@ func TestDownloadFile(t *testing.T) {
 }
 
 func TestGetReportFindings(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	expectedFindings := []inspectorReportFinding{
 		{
 			RulePackageName: "CIS Operating System Security Configuration Benchmarks-1.0",

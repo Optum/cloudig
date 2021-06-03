@@ -2,12 +2,14 @@ package cloudig
 
 import (
 	"errors"
+	"io/ioutil"
 	"sort"
 	"testing"
 	"time"
 
 	"github.com/Optum/cloudig/pkg/mocks"
 	"github.com/golang/mock/gomock"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -15,6 +17,7 @@ import (
 )
 
 func TestAWSConfigGetReport(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name                          string
 		accountID                     string
@@ -154,6 +157,7 @@ func TestAWSConfigGetReport(t *testing.T) {
 }
 
 func TestProcessConfigResults(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
 	testCases := []struct {
 		name           string
 		results        map[string][]*configservice.EvaluationResult

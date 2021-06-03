@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/kris-nova/logger"
+	"github.com/sirupsen/logrus"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -56,10 +56,10 @@ func (reports *InspectorReports) GetReport(client awslocal.APIs, comments []Comm
 	if err != nil {
 		return err
 	}
-	logger.Info("working on Inspector report for account: %s", accountID)
+	logrus.Infof("working on Inspector report for account: %s", accountID)
 	report.AccountID = accountID
 
-	logger.Info("finding most recent assessment run for template(s) in account: %s", accountID)
+	logrus.Infof("finding most recent assessment run for template(s) in account: %s", accountID)
 	// Get most recent Assessment Run ARNs for each template
 	assessmentRunInfo, err := client.GetMostRecentAssessmentRunInfo()
 	if err != nil {
@@ -73,14 +73,14 @@ func (reports *InspectorReports) GetReport(client awslocal.APIs, comments []Comm
 		if err != nil {
 			return err
 		}
-		logger.Info("generating a report for %s in account: %s", run["templateName"], accountID)
+		logrus.Infof("generating a report for %s in account: %s", run["templateName"], accountID)
 
 		reportFile, err := reports.Helper.downloadReport(reportURL, report)
 		if err != nil {
 			return err
 		}
 
-		logger.Info("parsing report for findings in account: %s", accountID)
+		logrus.Infof("parsing report for findings in account: %s", accountID)
 		// Parse report page HTML and build table of findings
 		reportFindings, err := getReportFindings(reportFile, comments, report)
 		if err != nil {
@@ -88,7 +88,7 @@ func (reports *InspectorReports) GetReport(client awslocal.APIs, comments []Comm
 		}
 		report.Findings = reportFindings
 
-		logger.Info("finding AMI properties associated with the scan in account: %s", accountID)
+		logrus.Infof("finding AMI properties associated with the scan in account: %s", accountID)
 
 		// Get list of AMIS that have a given list of tags and their age in days
 		amiAgeMap, err := getAssessmentRunAgentAMIAndAge(client, run["targetArn"])
@@ -102,7 +102,7 @@ func (reports *InspectorReports) GetReport(client awslocal.APIs, comments []Comm
 
 	}
 
-	logger.Success("getting Inspector Report for account %s took %s", report.AccountID, time.Since(start))
+	logrus.Infof("getting Inspector Report for account %s took %s", report.AccountID, time.Since(start))
 	return nil
 }
 
@@ -134,7 +134,7 @@ func getReportFindings(reportFile string, comments []Comments, report inspectorR
 			case 4:
 				inspectorReportFinding.Informational = col
 			default:
-				logger.Warning("error parsing finding table from the report")
+				logrus.Warnf("error parsing finding table from the report")
 			}
 		}
 
