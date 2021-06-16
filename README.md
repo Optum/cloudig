@@ -24,46 +24,9 @@ The currently supported cloud sources are:
 
 - [AWS Health Notifications](https://aws.amazon.com/premiumsupport/technology/personal-health-dashboard/): Provides relevant and timely information to help manage events in progress, and provides proactive notification to help you plan for scheduled activities.
 
-### Example output:
+### Demo
+![demo](doc/demo.gif)
 
-```
-[ℹ]  reading comments from file comments.yaml
-[ℹ]  working on reflect report for account: 111111111111
-[ℹ]  getting the s3 prefix associated with the CloudTrail
-[ℹ]  constructing the Athena table metadata form the s3 prefix
-[ℹ]  finding the existing Athena table from the constructed metadata
-[ℹ]  found the existing Athena table: default.reflect_cloudtrail_gxev4
-[ℹ]  populating findings for roles
-[✔]  successfully populated the findings for roles
-[ℹ]  finding the actual permission for the roles
-[✔]  reflecting on account 111111111111 took 23.793137533s
-{
-  "findings": [
-    {
-      "accountId": "111111111111",
-      "IAMIdentity": "arn:aws:iam::111111111111:role/web-gateway-greencherry-dev",
-      "accessDetails": [
-        {
-          "IAMAction": "kms.amazonaws.com/Decrypt",
-          "UsageCount": 3
-        }
-      ],
-      "permissionSet": [
-        "kms:ListKeys",
-        "kms:ListGrants",
-        "kms:GenerateDataKeyWithoutPlaintext",
-        "kms:GenerateDataKey",
-        "kms:Encrypt",
-        "kms:DescribeKey",
-        "kms:Decrypt",
-        "events:PutEvents"
-      ],
-      "comments": "**WORK_IN_PROGRESS:** Lot of unnecessary permissions"
-    }
-  ],
-  "reportTime": "21 Dec 20 10:53 CST"
-}
-```
 
 ### Installation
 
