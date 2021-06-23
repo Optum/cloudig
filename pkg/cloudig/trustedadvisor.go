@@ -44,7 +44,7 @@ func (report *TrustedAdvisorReport) GetReport(client awslocal.APIs, comments []C
 		return err
 	}
 
-	report.Findings = processTrustedAdvisorResults(results, accountID, comments)
+	report.Findings = append(report.Findings, processTrustedAdvisorResults(results, accountID, comments)...)
 	logger.Success("getting AWS TrustedAdvisorReport for account %s took %s", finding.AccountID, time.Since(start))
 	return nil
 }
