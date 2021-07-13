@@ -64,7 +64,7 @@ func processTrustedAdvisorResults(results map[*support.TrustedAdvisorCheckDescri
 		finding.Comments = getComments(comments, finding.AccountID, findingTypeTrustedAdvisor, finding.Category+"-"+strings.Replace(finding.Name, " ", "_", -1))
 		for _, resource := range result.FlaggedResources {
 			if resource.Metadata != nil {
-				if aws.StringValue(resource.Metadata[0]) != "Green" {
+				if !awslocal.SdkStringContains(resource.Metadata, aws.String("Green")) && aws.BoolValue(resource.IsSuppressed) == false {
 					flaggedResource := aws.StringValue(resource.Metadata[1])
 					if aws.StringValue(resource.Metadata[2]) != "" && aws.StringValue(check.Metadata[1]) == "Region" {
 						flaggedResourceMeta := aws.StringValue(resource.Metadata[2])
