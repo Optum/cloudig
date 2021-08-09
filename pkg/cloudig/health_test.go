@@ -19,6 +19,7 @@ func TestGetHealthReport(t *testing.T) {
 	testCases := []struct {
 		name               string
 		eventInput         []*string
+		inputFlags         healthReportFlags
 		eventFilter        *health.EventFilter
 		eventAPIResponses  []*health.DescribeEventsOutput
 		detailInput        [][]*string
@@ -32,6 +33,10 @@ func TestGetHealthReport(t *testing.T) {
 		{
 			name:       "Basic Get Report Run",
 			eventInput: []*string{nil},
+			inputFlags: healthReportFlags{
+				Details:  false,
+				PastDays: "",
+			},
 			eventFilter: &health.EventFilter{
 				EventTypeCategories: []*string{aws.String("accountNotification")},
 				EventStatusCodes:    []*string{aws.String("open"), aws.String("upcoming")},
@@ -100,6 +105,182 @@ func TestGetHealthReport(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:       "Exclude Region",
+			eventInput: []*string{nil},
+			inputFlags: healthReportFlags{
+				Details:        false,
+				PastDays:       "",
+				ExcludeRegions: []string{"region2"},
+			},
+			eventFilter: &health.EventFilter{
+				EventTypeCategories: []*string{aws.String("accountNotification")},
+				EventStatusCodes:    []*string{aws.String("open"), aws.String("upcoming")},
+				LastUpdatedTimes: []*health.DateTimeRange{
+					{},
+				},
+			},
+			eventAPIResponses: []*health.DescribeEventsOutput{
+				{
+					Events: []*health.Event{
+						{
+							Arn: aws.String("arn1"),
+						},
+					},
+					NextToken: nil,
+				},
+			},
+			detailInput: [][]*string{
+				{aws.String("arn1")},
+			},
+			detailAPIResponses: []*health.DescribeEventDetailsOutput{
+				{
+					SuccessfulSet: []*health.EventDetails{
+						{
+							Event: &health.Event{
+								Arn:             aws.String("arn1"),
+								Region:          aws.String("region"),
+								EventTypeCode:   aws.String("EVENT_CODE"),
+								LastUpdatedTime: &time.Time{},
+								StatusCode:      aws.String("status"),
+							},
+							EventDescription: &health.EventDescription{
+								LatestDescription: aws.String("description"),
+							},
+						},
+						{
+							Event: &health.Event{
+								Arn:             aws.String("arn1"),
+								Region:          aws.String("region2"),
+								EventTypeCode:   aws.String("EVENT_CODE"),
+								LastUpdatedTime: &time.Time{},
+								StatusCode:      aws.String("status"),
+							},
+							EventDescription: &health.EventDescription{
+								LatestDescription: aws.String("description"),
+							},
+						},
+					},
+				},
+			},
+			entityInputArn: [][]*string{
+				{aws.String("arn1")},
+			},
+			entityInputToken: []*string{nil, aws.String("a token")},
+			entityAPIResponses: []*health.DescribeAffectedEntitiesOutput{
+				{
+					Entities: []*health.AffectedEntity{
+						{
+							EntityValue: aws.String("entity value1"),
+							EventArn:    aws.String("arn1"),
+						},
+					},
+					NextToken: nil,
+				},
+			},
+			expectedError: nil,
+			expectedOutput: []healthReportFinding{
+				{
+					AccountID:        "account",
+					AffectedEntities: []string{"entity value1"},
+					Arn:              "arn1",
+					Comments:         "NEW_FINDING",
+					EventTypeCode:    "Event Code",
+					LastUpdatedTime:  "0001-01-01 00:00:00 +0000 UTC",
+					Region:           "region",
+					StatusCode:       "status",
+					EventDescription: "description",
+				},
+			},
+		},
+		{
+			name:       "Include Region",
+			eventInput: []*string{nil},
+			inputFlags: healthReportFlags{
+				Details:        false,
+				PastDays:       "",
+				IncludeRegions: []string{"region"},
+			},
+			eventFilter: &health.EventFilter{
+				EventTypeCategories: []*string{aws.String("accountNotification")},
+				EventStatusCodes:    []*string{aws.String("open"), aws.String("upcoming")},
+				LastUpdatedTimes: []*health.DateTimeRange{
+					{},
+				},
+			},
+			eventAPIResponses: []*health.DescribeEventsOutput{
+				{
+					Events: []*health.Event{
+						{
+							Arn: aws.String("arn1"),
+						},
+					},
+					NextToken: nil,
+				},
+			},
+			detailInput: [][]*string{
+				{aws.String("arn1")},
+			},
+			detailAPIResponses: []*health.DescribeEventDetailsOutput{
+				{
+					SuccessfulSet: []*health.EventDetails{
+						{
+							Event: &health.Event{
+								Arn:             aws.String("arn1"),
+								Region:          aws.String("region"),
+								EventTypeCode:   aws.String("EVENT_CODE"),
+								LastUpdatedTime: &time.Time{},
+								StatusCode:      aws.String("status"),
+							},
+							EventDescription: &health.EventDescription{
+								LatestDescription: aws.String("description"),
+							},
+						},
+						{
+							Event: &health.Event{
+								Arn:             aws.String("arn1"),
+								Region:          aws.String("region2"),
+								EventTypeCode:   aws.String("EVENT_CODE"),
+								LastUpdatedTime: &time.Time{},
+								StatusCode:      aws.String("status"),
+							},
+							EventDescription: &health.EventDescription{
+								LatestDescription: aws.String("description"),
+							},
+						},
+					},
+				},
+			},
+			entityInputArn: [][]*string{
+				{aws.String("arn1")},
+			},
+			entityInputToken: []*string{nil, aws.String("a token")},
+			entityAPIResponses: []*health.DescribeAffectedEntitiesOutput{
+				{
+					Entities: []*health.AffectedEntity{
+						{
+							EntityValue: aws.String("entity value1"),
+							EventArn:    aws.String("arn1"),
+						},
+					},
+					NextToken: nil,
+				},
+			},
+			expectedError: nil,
+			expectedOutput: []healthReportFinding{
+				{
+					AccountID:        "account",
+					AffectedEntities: []string{"entity value1"},
+					Arn:              "arn1",
+					Comments:         "NEW_FINDING",
+					EventTypeCode:    "Event Code",
+					LastUpdatedTime:  "0001-01-01 00:00:00 +0000 UTC",
+					Region:           "region",
+					StatusCode:       "status",
+					EventDescription: "description",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -118,10 +299,7 @@ func TestGetHealthReport(t *testing.T) {
 
 			comments := parseCommentsFile("../../test/data/comments.yaml")
 			report := &HealthReport{
-				Flags: healthReportFlags{
-					Details:  false,
-					PastDays: "",
-				},
+				Flags: tc.inputFlags,
 			}
 			err := report.GetReport(mockAPIs, comments)
 

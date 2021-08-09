@@ -22,8 +22,10 @@ type HealthReport struct {
 }
 
 type healthReportFlags struct {
-	Details  bool
-	PastDays string
+	Details        bool
+	PastDays       string
+	ExcludeRegions []string
+	IncludeRegions []string
 }
 
 type healthReportFinding struct {
@@ -87,6 +89,12 @@ func (report *HealthReport) GetReport(client awslocal.APIs, comments []Comments)
 			Region:           *details.Event.Region,
 			StatusCode:       *details.Event.StatusCode,
 			EventDescription: eventDes,
+		}
+		// exclude takes precedence over include
+		if len(report.Flags.ExcludeRegions) > 0 && Contains(report.Flags.ExcludeRegions, finding.Region) {
+			continue
+		} else if len(report.Flags.IncludeRegions) > 0 && !Contains(report.Flags.IncludeRegions, finding.Region) {
+			continue
 		}
 		report.Findings = append(report.Findings, finding)
 	}
