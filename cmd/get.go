@@ -19,6 +19,8 @@ var (
 	output                string
 	region                string
 	pastDays              string
+	healthExcludeRegions  string
+	healthIncludeRegions  string
 	details               bool
 	ecrImageTag           string
 	identityARNs          string
@@ -98,12 +100,24 @@ var healthCmd = &cobra.Command{
 	Aliases: []string{"he", "h", "healthnotifications", "healthnotification"},
 
 	Run: func(cmd *cobra.Command, args []string) {
+		excludeRegionsArr := strings.Split(healthExcludeRegions, ",")
+		if healthExcludeRegions == "" {
+			excludeRegionsArr = []string{}
+		}
+		includeRegionsArr := strings.Split(healthIncludeRegions, ",")
+		if healthIncludeRegions == "" {
+			includeRegionsArr = []string{}
+		}
 		flags := struct {
-			Details  bool
-			PastDays string
+			Details        bool
+			PastDays       string
+			ExcludeRegions []string
+			IncludeRegions []string
 		}{
-			Details:  details,
-			PastDays: pastDays,
+			Details:        details,
+			PastDays:       pastDays,
+			ExcludeRegions: excludeRegionsArr,
+			IncludeRegions: includeRegionsArr,
 		}
 
 		execute(&cloudig.HealthReport{
@@ -213,6 +227,8 @@ func init() {
 	// healthCmd specific flags
 	healthCmd.PersistentFlags().BoolVarP(&details, "details", "d", false, "Flag to indicate level of printing for each notification (default false)")
 	healthCmd.PersistentFlags().StringVar(&pastDays, "pastdays", "", "Number of past days to get results from")
+	healthCmd.PersistentFlags().StringVar(&healthExcludeRegions, "exclude-regions", "", "Set of regions separated by [,] to exclude Health Notifications from. Takes precedence over include-regions")
+	healthCmd.PersistentFlags().StringVar(&healthIncludeRegions, "include-regions", "", "Set of regions separated by [,] to include Health Notifications from. Use \"global\" as a region if wanting notifications affecting all regions. Ignored when exclude-regions is set")
 
 	// ecrScanCmd specific flags
 	ecrScanCmd.PersistentFlags().StringVar(&ecrImageTag, "tag", "", "Tag of ECR image(s) to report scan results.")
