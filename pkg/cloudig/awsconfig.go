@@ -63,13 +63,19 @@ func processConfigResults(results map[string][]*configservice.EvaluationResult, 
 		finding.RuleName = name
 		finding.Status = configservice.ComplianceTypeNonCompliant // keeping this for backword compatibility
 		finding.Comments = getComments(comments, finding.AccountID, findingTypeAWSConfig, finding.RuleName)
-		flaggedResources := []string{}
+		finding.FlaggedResources = map[string][]string{}
+
 		for _, evaluationResult := range result {
-			if aws.StringValue(evaluationResult.ComplianceType) != configservice.ComplianceTypeCompliant {
-				flaggedResources = append(flaggedResources, aws.StringValue(evaluationResult.EvaluationResultIdentifier.EvaluationResultQualifier.ResourceId))
+			if aws.StringValue(evaluationResult.ComplianceType) == configservice.ComplianceTypeCompliant {
+				continue
 			}
+
+			resType := aws.StringValue(evaluationResult.EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType)
+			resId := aws.StringValue(evaluationResult.EvaluationResultIdentifier.EvaluationResultQualifier.ResourceId)
+
+			finding.FlaggedResources[resType] = append(finding.FlaggedResources[resType], resId)
 		}
-		finding.FlaggedResources = map[string][]string{aws.StringValue(result[0].EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType): flaggedResources}
+
 		findings = append(findings, finding)
 	}
 
