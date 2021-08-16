@@ -19,7 +19,7 @@ type ConfigReport struct {
 type configFinding struct {
 	AccountID string `json:"accountId"`
 	RuleName  string `json:"ruleName"`
-	//Description      string
+	// Description      string
 	Status           string              `json:"status"`
 	FlaggedResources map[string][]string `json:"flaggedResources"`
 	Comments         string              `json:"comments"`

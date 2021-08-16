@@ -3,6 +3,7 @@ package cloudig
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -52,11 +53,12 @@ func (report *ConfigReport) toTable(tableType string) string {
 	table, tableString := getTableWriterWithHeaders(tableType, []string{"Account ID", "Name", "Flagged Resources", "Comments"})
 	// build table rows
 	for _, finding := range report.Findings {
-		var flaggedResourcesCol string
+		flaggedResourcesCol := map[string]string{}
 		for resourceType, flaggedResources := range finding.FlaggedResources {
-			flaggedResourcesCol = "Resource Type: " + resourceType + "\n" + strings.Join(flaggedResources, "\n")
+			flaggedResourcesCol[resourceType] = "Resource Type: " + resourceType + "\n" + strings.Join(flaggedResources, "\n")
 		}
-		table.Append([]string{finding.AccountID, finding.RuleName, flaggedResourcesCol, finding.Comments})
+
+		table.Append([]string{finding.AccountID, finding.RuleName, strings.Join(mapToListSorted(flaggedResourcesCol), "\n"), finding.Comments})
 	}
 
 	logger.Always("report Time: %s", report.ReportTime)
@@ -180,4 +182,18 @@ func getTableWriterWithHeaders(tableType string, headers []string) (*tablewriter
 		table.SetCenterSeparator("|")
 	}
 	return table, tableString
+}
+
+func mapToListSorted(unsorted map[string]string) (sorted []string) {
+	keys := make([]string, 0, len(unsorted))
+	for k := range unsorted {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		sorted = append(sorted, unsorted[k])
+	}
+
+	return
 }

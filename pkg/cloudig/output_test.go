@@ -195,7 +195,7 @@ func TestAWSConfigTableOutput(t *testing.T) {
 						AccountID:        "111111111111",
 						RuleName:         "ALL_OPEN_INBOUND_PORTS_SECURITY_GROUP_CHECK",
 						Status:           "NON_COMPLIANT",
-						FlaggedResources: map[string][]string{"AWS::EC2::SecurityGroup": {"sg-00003"}},
+						FlaggedResources: map[string][]string{"AWS::EC2::SecurityGroup": {"sg-00003"}, "AWS::EC2::Instance": {"i-00003"}},
 						Comments:         "NEW_FINDING",
 					},
 					{
@@ -211,6 +211,8 @@ func TestAWSConfigTableOutput(t *testing.T) {
 			expectedOutput: `|  ACCOUNT ID  |                    NAME                     |          FLAGGED RESOURCES          |  COMMENTS   |
 |--------------|---------------------------------------------|-------------------------------------|-------------|
 | 111111111111 | ALL_OPEN_INBOUND_PORTS_SECURITY_GROUP_CHECK | Resource Type:                      | NEW_FINDING |
+|              |                                             | AWS::EC2::Instance                  |             |
+|              |                                             | i-00003 Resource Type:              |             |
 |              |                                             | AWS::EC2::SecurityGroup             |             |
 |              |                                             | sg-00003                            |             |
 | 111111111111 | S3_BUCKET_LOGGING_ENABLED                   | Resource Type: AWS::S3::Bucket      | NEW_FINDING |
