@@ -65,10 +65,27 @@ func processTrustedAdvisorResults(results map[*support.TrustedAdvisorCheckDescri
 		for _, resource := range result.FlaggedResources {
 			if resource.Metadata != nil {
 				if !awslocal.SdkStringContains(resource.Metadata, aws.String("Green")) && aws.BoolValue(resource.IsSuppressed) == false {
-					flaggedResource := aws.StringValue(resource.Metadata[1])
-					if aws.StringValue(resource.Metadata[2]) != "" && aws.StringValue(check.Metadata[1]) == "Region" {
-						flaggedResourceMeta := aws.StringValue(resource.Metadata[2])
-						flaggedResource = strings.Join([]string{flaggedResource, flaggedResourceMeta}, "/")
+					var flaggedResource string
+					// if not region, important flagged resource will be in field 1
+					if len(resource.Metadata) > 1 {
+						flaggedResource = aws.StringValue(resource.Metadata[1])
+					} else if len(resource.Metadata) == 1 {
+						// only pick metadata 0 if no other option
+						flaggedResource = aws.StringValue(resource.Metadata[0])
+					}
+
+					// clarify which region flaggedResource is part of
+					regionIndex := -1
+					for i, metadata := range check.Metadata {
+						// Convers Region and Region/AZ and other variations
+						if strings.Contains(aws.StringValue(metadata), "Region") {
+							regionIndex = i
+							break
+						}
+					}
+					if regionIndex > -1 && len(resource.Metadata) >= (regionIndex+1) && aws.StringValue(resource.Metadata[regionIndex]) != "" {
+						// important resource is after region in metadata
+						flaggedResource = strings.Join([]string{aws.StringValue(resource.Metadata[regionIndex]), aws.StringValue(resource.Metadata[regionIndex+1])}, "/")
 					}
 					finding.FlaggedResources = append(finding.FlaggedResources, flaggedResource)
 				}

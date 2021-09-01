@@ -1,4 +1,8 @@
-## v0.1.2 ( 9 August 2021)
+## v0.1.4 ( 1 September 2021)
+
+* Add fix for trusted advisor metadata coming in unexpected order
+
+## v0.1.3 ( 9 August 2021)
 
 * Add --exclude-regions option to health command
 * Add --include-regions option to health command
