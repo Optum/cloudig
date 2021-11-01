@@ -61,7 +61,7 @@ func TestImageScanReports_GetReport(t *testing.T) {
 				{
 					AccountID:      "012345678910",
 					ImageDigest:    "sha256:e0fa362f30aa43f11d1d5e1822ef3117e03782cdd921aaab73267e1219a4fde2",
-					ImageTag:       "prod-canary",
+					ImageTag:       "prod-canary,test",
 					RepositoryName: "app/web-server",
 					ImageFindingsCount: map[string]int64{
 						"HIGH":   2,
@@ -69,26 +69,6 @@ func TestImageScanReports_GetReport(t *testing.T) {
 					},
 					Comments: "EXCEPTION Patch will applied this weekend",
 					Region:   "us-east-1",
-				},
-				{
-					AccountID:      "012345678910",
-					ImageDigest:    "sha256:e0fa362f30aa43f11d1d5e1822ef3117e03782cdd921aaab73267e1219a4fde2",
-					ImageTag:       "test",
-					RepositoryName: "app/web-server",
-					ImageFindingsCount: map[string]int64{
-						"HIGH":   2,
-						"MEDIUM": 8,
-					},
-					Comments: "NEW_FINDING",
-					Region:   "us-east-1",
-				},
-				{
-					AccountID:      "012345678910",
-					ImageDigest:    "sha256:4e3bc79a145b6bb5756f8f52f60853e842a1681ace8b5115a715c892f4957ea9",
-					ImageTag:       "test",
-					RepositoryName: "app/hello-world",
-					Comments:       "NEW_FINDING",
-					Region:         "us-east-1",
 				},
 			},
 		},
