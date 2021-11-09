@@ -1,6 +1,7 @@
 package cloudig
 
 import (
+	"strings"
 	"time"
 
 	awslocal "github.com/Optum/cloudig/pkg/aws"
@@ -60,33 +61,39 @@ func (report *ImageScanReports) GetReport(client awslocal.APIs, comments []Comme
 	for repo, imageList := range images {
 		// If a tag was specified there should only be one image returned per repo
 		if report.Flags.Tag != "" && len(imageList) == 1 {
-			imageURI := repo + ":" + report.Flags.Tag
-			scanReport := ImageScanFindings{
-				AccountID:          accountID,
-				ImageDigest:        aws.StringValue(imageList[0].ImageDigest),
-				ImageTag:           report.Flags.Tag,
-				RepositoryName:     aws.StringValue(imageList[0].RepositoryName),
-				ImageFindingsCount: convertScanFindings(imageList[0]),
-				Comments:           getComments(comments, accountID, findingTypeECRScan, imageURI),
-				Region:             report.Flags.Region,
+			scanFindingCountMap := convertScanFindings(imageList[0])
+			if len(scanFindingCountMap) > 0 {
+				imageURI := repo + ":" + report.Flags.Tag
+				scanReport := ImageScanFindings{
+					AccountID:          accountID,
+					ImageDigest:        aws.StringValue(imageList[0].ImageDigest),
+					ImageTag:           report.Flags.Tag,
+					RepositoryName:     aws.StringValue(imageList[0].RepositoryName),
+					ImageFindingsCount: scanFindingCountMap,
+					Comments:           getComments(comments, accountID, findingTypeECRScan, imageURI),
+					Region:             report.Flags.Region,
+				}
+				report.Findings = append(report.Findings, scanReport)
 			}
-			report.Findings = append(report.Findings, scanReport)
+
 		} else {
 			//	Create finding for each tag
 			for _, image := range imageList {
-				for _, tag := range aws.StringValueSlice(image.ImageTags) {
-					imageURI := repo + ":" + tag
+				scanFindingCountMap := convertScanFindings(image)
+				if len(scanFindingCountMap) > 0 {
+					imageURI := repo + ":" + aws.StringValueSlice(image.ImageTags)[0]
 					scanReport := ImageScanFindings{
 						AccountID:          accountID,
 						ImageDigest:        aws.StringValue(image.ImageDigest),
-						ImageTag:           tag,
+						ImageTag:           strings.Join(aws.StringValueSlice(image.ImageTags), ","),
 						RepositoryName:     aws.StringValue(image.RepositoryName),
-						ImageFindingsCount: convertScanFindings(image),
+						ImageFindingsCount: scanFindingCountMap,
 						Comments:           getComments(comments, accountID, findingTypeECRScan, imageURI),
 						Region:             report.Flags.Region,
 					}
 					report.Findings = append(report.Findings, scanReport)
 				}
+
 			}
 		}
 	}
