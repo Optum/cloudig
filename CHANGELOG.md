@@ -1,3 +1,8 @@
+## v0.1.5 ( 9 November 2021)
+
+* Add filtering to ecr output to not display if no findings found
+* Condense ecr report so multiple tags are together for one image digest
+
 ## v0.1.4 ( 1 September 2021)
 
 * Add fix for trusted advisor metadata coming in unexpected order
