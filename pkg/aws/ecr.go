@@ -8,6 +8,7 @@ import (
 // ECRSVC is a wrapper for ECR Image Scan API calls
 type ECRSVC interface {
 	GetECRImagesWithTag(tag string) (map[string][]*ecr.ImageDetail, error)
+	GetECRImageScanFindings(*ecr.ImageDetail) map[string]int64
 }
 
 // GetECRImagesWithTag finds all ECR images with a given tag. If no tag specified, all tagged images are returned
@@ -65,4 +66,23 @@ func (client *Client) GetECRImagesWithTag(tag string) (map[string][]*ecr.ImageDe
 	}
 
 	return images, nil
+}
+
+func (client *Client) GetECRImageScanFindings(image *ecr.ImageDetail) map[string]int64 {
+	if image != nil {
+		scanFindings, err := client.ECR.DescribeImageScanFindings(&ecr.DescribeImageScanFindingsInput{
+			ImageId: &ecr.ImageIdentifier{
+				ImageDigest: image.ImageDigest,
+			},
+			RegistryId:     image.RegistryId,
+			RepositoryName: image.RepositoryName,
+		})
+		if err != nil {
+			return nil
+		}
+		if scanFindings != nil && scanFindings.ImageScanStatus != nil {
+			return aws.Int64ValueMap(scanFindings.ImageScanFindings.FindingSeverityCounts)
+		}
+	}
+	return nil
 }

@@ -223,3 +223,59 @@ func TestClient_GetECRImagesWithTag(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_GetECRImageScanFindings(t *testing.T) {
+	testCases := []struct {
+		name                            string
+		image                           *ecr.ImageDetail
+		describeImageScanFindingsOutput *ecr.DescribeImageScanFindingsOutput
+		scanFindingsMap                 map[string]int64
+	}{
+		{
+			name:                            "test case with empty image details",
+			image:                           nil,
+			scanFindingsMap:                 nil,
+			describeImageScanFindingsOutput: nil,
+		}, {
+			name: "test case with valid image details",
+			image: &ecr.ImageDetail{
+				ImageTags:      aws.StringSlice([]string{"prod-canary"}),
+				RegistryId:     aws.String("012345678910"),
+				RepositoryName: aws.String("app/web-server"),
+				ImageDigest:    aws.String("prod-canary-image-digest"),
+			},
+			describeImageScanFindingsOutput: &ecr.DescribeImageScanFindingsOutput{
+				ImageScanStatus: &ecr.ImageScanStatus{
+					Status: aws.String("COMPLETE"),
+				},
+				ImageScanFindings: &ecr.ImageScanFindings{
+					FindingSeverityCounts: map[string]*int64{
+						"MEDIUM":   aws.Int64(1),
+						"CRITICAL": aws.Int64(1),
+					},
+				},
+			},
+			scanFindingsMap: map[string]int64{
+				"MEDIUM":   1,
+				"CRITICAL": 1,
+			},
+		},
+	}
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockECRAPI := mocks.NewMockECRAPI(mockCtrl)
+			if test.image != nil {
+				mockECRAPI.EXPECT().DescribeImageScanFindings(gomock.Any()).Return(test.describeImageScanFindingsOutput, nil).MaxTimes(1)
+			}
+			client := &Client{
+				ECR: mockECRAPI,
+			}
+			got := client.GetECRImageScanFindings(test.image)
+			if !reflect.DeepEqual(got, test.scanFindingsMap) {
+				t.Errorf("GetECRImageScanFindings() got = %v, want %v", got, test.scanFindingsMap)
+			}
+		})
+	}
+}

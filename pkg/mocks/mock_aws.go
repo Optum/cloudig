@@ -92,6 +92,14 @@ func (m *MockAPIs) GetECRImagesWithTag(arg0 string) (map[string][]*ecr.ImageDeta
 	return ret0, ret1
 }
 
+// GetECRImageScanFindings mocks base method
+func (m *MockAPIs) GetECRImageScanFindings(arg0 *ecr.ImageDetail) map[string]int64 {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetECRImageScanFindings", arg0)
+	ret0, _ := ret[0].(map[string]int64)
+	return ret0
+}
+
 // GetECRImagesWithTag indicates an expected call of GetECRImagesWithTag
 func (mr *MockAPIsMockRecorder) GetECRImagesWithTag(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
