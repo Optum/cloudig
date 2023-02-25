@@ -17,8 +17,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
-	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
+	golang.org/x/net v0.7.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/neurosnap/sentences.v1 v1.0.6
 	gopkg.in/yaml.v2 v2.3.0
